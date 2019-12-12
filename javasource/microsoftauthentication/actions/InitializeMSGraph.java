@@ -7,30 +7,22 @@
 // Other code you write will be lost the next time you deploy the project.
 // Special characters, e.g., é, ö, à, etc. are supported in comments.
 
-package o365authentication.actions;
+package microsoftauthentication.actions;
 
-import com.mendix.core.Core;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
-import o365authentication.PermissionHandler;
-import com.mendix.systemwideinterfaces.core.IMendixObject;
+import microsoftauthentication.PermissionHandler;
 
-public class Initialize extends CustomJavaAction<java.lang.Boolean>
+public class InitializeMSGraph extends CustomJavaAction<java.lang.Boolean>
 {
-	private IMendixObject __ClientConfig;
-	private o365authentication.proxies.ClientConfiguration ClientConfig;
-
-	public Initialize(IContext context, IMendixObject ClientConfig)
+	public InitializeMSGraph(IContext context)
 	{
 		super(context);
-		this.__ClientConfig = ClientConfig;
 	}
 
 	@java.lang.Override
 	public java.lang.Boolean executeAction() throws Exception
 	{
-		this.ClientConfig = __ClientConfig == null ? null : o365authentication.proxies.ClientConfiguration.initialize(getContext(), __ClientConfig);
-
 		// BEGIN USER CODE
 
 		PermissionHandler._initialize();
@@ -45,7 +37,7 @@ public class Initialize extends CustomJavaAction<java.lang.Boolean>
 	@java.lang.Override
 	public java.lang.String toString()
 	{
-		return "Initialize";
+		return "InitializeMSGraph";
 	}
 
 	// BEGIN EXTRA CODE

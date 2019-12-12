@@ -7,7 +7,7 @@
 // Other code you write will be lost the next time you deploy the project.
 // Special characters, e.g., é, ö, à, etc. are supported in comments.
 
-package o365authentication.actions;
+package microsoftauthentication.actions;
 
 import com.mendix.core.Core;
 import com.mendix.systemwideinterfaces.core.IContext;

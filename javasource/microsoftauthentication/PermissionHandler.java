@@ -1,4 +1,4 @@
-package o365authentication;
+package microsoftauthentication;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.mendix.m2ee.api.IMxRuntimeResponse;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 
-import o365authentication.proxies.ClientConfiguration;
+import microsoftauthentication.proxies.ClientConfiguration;
 
 public class PermissionHandler extends RequestHandler {
 
@@ -33,8 +33,8 @@ public class PermissionHandler extends RequestHandler {
 			String 	state = request.getParameter("state"),
 					tenant = request.getParameter("tenant"), 
 					admin_consent = request.getParameter("admin_consent"),
-					code = request.getParameter("code"), 
-					session_state = request.getParameter("session_state");
+					code = request.getParameter("code"); 
+//					session_state = request.getParameter("session_state");
 			
 			IContext context = Core.createSystemContext();
 			List<IMendixObject> result = Core.retrieveXPathQuery(context, "//" + ClientConfiguration.entityName + "[" + ClientConfiguration.MemberNames.InternalId + "=" + state + "]");
@@ -47,7 +47,7 @@ public class PermissionHandler extends RequestHandler {
 					obj.setValue(context, ClientConfiguration.MemberNames.AuthenticationCode.toString(), code );
 					Core.commit(context, obj);
 					
-					o365authentication.proxies.microflows.Microflows.mB_RequestTokenFromConsentCode(context, ClientConfiguration.initialize(context, obj));
+					microsoftauthentication.proxies.microflows.Microflows.mB_RequestTokenFromConsentCode(context, ClientConfiguration.initialize(context, obj));
 					
 					response.getHttpServletResponse().sendRedirect( Core.getConfiguration().getApplicationRootUrl() );
 				}
@@ -89,7 +89,7 @@ public class PermissionHandler extends RequestHandler {
 
 	public static synchronized void _initialize() {
 		if( !PermissionHandler._isInitialized  ) {
-			Core.addRequestHandler("o365/", new PermissionHandler());
+			Core.addRequestHandler(microsoftauthentication.proxies.constants.Constants.getRequestHandler() + "/", new PermissionHandler());
 			PermissionHandler._isInitialized = true;
 		}
 	}
