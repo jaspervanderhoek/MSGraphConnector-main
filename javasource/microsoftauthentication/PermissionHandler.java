@@ -43,13 +43,19 @@ public class PermissionHandler extends RequestHandler {
 				
 				if( path != null && path.startsWith("consent") ) {
 					obj.setValue(context, ClientConfiguration.MemberNames.HasUserConsent.toString(), true );
-					obj.setValue(context, ClientConfiguration.MemberNames.AdminConsentAquiredOn.toString(), new Date() );
+					obj.setValue(context, ClientConfiguration.MemberNames.UserConsentAquiredOn.toString(), new Date() );
 					obj.setValue(context, ClientConfiguration.MemberNames.AuthenticationCode.toString(), code );
 					Core.commit(context, obj);
 					
-					microsoftauthentication.proxies.microflows.Microflows.mB_RequestTokenFromConsentCode(context, ClientConfiguration.initialize(context, obj));
-					
-					response.getHttpServletResponse().sendRedirect( Core.getConfiguration().getApplicationRootUrl() );
+					String msg = microsoftauthentication.proxies.microflows.Microflows.mB_RequestTokenFromConsentCode(context, ClientConfiguration.initialize(context, obj));
+					if( msg == null || "OK".equals(msg) ) {
+						response.getHttpServletResponse().getWriter().append("Successfully aquired user consent.\n\n"
+								+ "Auth Code: " + code + "\n"
+								+ "");
+					}
+					else 
+						response.getHttpServletResponse().getWriter().append(msg);
+//					response.getHttpServletResponse().sendRedirect( Core.getConfiguration().getApplicationRootUrl() );
 				}
 				//Admin consent callback
 				else if( path != null && path.startsWith("permissions") ) {
@@ -57,14 +63,20 @@ public class PermissionHandler extends RequestHandler {
 					if( internalId.equals(state) ) {
 						boolean consent = ( "true".equalsIgnoreCase(admin_consent) );
 						obj.setValue(context, ClientConfiguration.MemberNames.HasAdminConsent.toString(), consent );
-						if( consent )
+						if( consent ) {
 							obj.setValue(context, ClientConfiguration.MemberNames.AdminConsentAquiredOn.toString(), new Date() );
-						else
+							response.getHttpServletResponse().getWriter().append("Successfully aquired admin consent." );
+						}
+						else {
 							obj.setValue(context, ClientConfiguration.MemberNames.AdminConsentAquiredOn.toString(), null );
+							response.getHttpServletResponse().getWriter().append("FAILED to aquired admin consent." );
+						}
 						
 						Core.commit(context, obj);
 						
-						response.getHttpServletResponse().sendRedirect( Core.getConfiguration().getApplicationRootUrl() );
+						
+						
+//						response.getHttpServletResponse().sendRedirect( Core.getConfiguration().getApplicationRootUrl() );
 					}
 					else {
 						_logNode.warn("Incorrect tenant info. [tenant " + tenant + ", state " + state + ", " + admin_consent +"]");
@@ -89,7 +101,7 @@ public class PermissionHandler extends RequestHandler {
 
 	public static synchronized void _initialize() {
 		if( !PermissionHandler._isInitialized  ) {
-			Core.addRequestHandler(microsoftauthentication.proxies.constants.Constants.getRequestHandler() + "/", new PermissionHandler());
+			Core.addRequestHandler("/o365/", new PermissionHandler());
 			PermissionHandler._isInitialized = true;
 		}
 	}
